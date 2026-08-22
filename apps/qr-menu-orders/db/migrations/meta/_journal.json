@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1787343454236,
+      "tag": "0000_worried_ronan",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1787368064459,
+      "tag": "0001_rich_major_mapleleaf",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1787368244653,
+      "tag": "0002_salty_argent",
+      "breakpoints": true
+    }
+  ]
+}

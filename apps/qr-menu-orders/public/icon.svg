@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="QR Menu Orders">
+  <rect width="64" height="64" rx="14" fill="#005db4"/>
+  <g fill="#ffffff">
+    <path d="M14 14h13v13H14V14zm3 3v7h7v-7h-7z"/>
+    <path d="M37 14h13v13H37V14zm3 3v7h7v-7h-7z"/>
+    <path d="M14 37h13v13H14V37zm3 3v7h7v-7h-7z"/>
+    <rect x="37" y="37" width="5" height="5"/>
+    <rect x="45" y="37" width="5" height="5"/>
+    <rect x="37" y="45" width="5" height="5"/>
+    <rect x="45" y="45" width="5" height="5"/>
+    <rect x="30" y="30" width="4" height="4"/>
+  </g>
+</svg>

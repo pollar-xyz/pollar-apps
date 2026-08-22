@@ -31,9 +31,9 @@
     {
       "slug": "qr-menu-orders",
       "category": "commerce",
-      "issue": null,
-      "deploy": null,
-      "author": null
+      "issue": "https://github.com/pollar-xyz/pollar-apps/issues/10",
+      "deploy": "https://qr-menu-orders-three.vercel.app",
+      "author": "ItzRodri"
     },
     {
       "slug": "raffle-hub",

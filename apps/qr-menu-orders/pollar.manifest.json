@@ -1,0 +1,8 @@
+{
+  "name": "QR Menu Orders",
+  "slug": "qr-menu-orders",
+  "description": "Scan the table QR, order from your phone and pay in USDC — the order lands paid on the owner's board.",
+  "category": "commerce",
+  "icon": "/icon.svg",
+  "url": "https://qr-menu-orders-three.vercel.app"
+}

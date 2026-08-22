@@ -1,0 +1,1 @@
+ALTER TABLE `restaurant` ADD `owner_email` text;
