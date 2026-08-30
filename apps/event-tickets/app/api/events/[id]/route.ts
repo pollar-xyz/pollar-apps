@@ -1,0 +1,100 @@
+import { NextResponse } from "next/server";
+import { requireAddress } from "@/lib/auth";
+import { db, dbReady } from "@/lib/db";
+import { stroopsToDecimal } from "@/lib/money";
+
+type Ctx = { params: Promise<{ id: string }> };
+
+type EventRow = {
+  id: string;
+  organizer_pollar_id: string;
+  name: string;
+  description: string;
+  datetime_utc: string;
+  place: string;
+  price_stroops: string;
+  capacity: number;
+  reserved: number;
+  created_at: string;
+};
+
+async function loadEvent(id: string): Promise<EventRow | null> {
+  const result = await db.execute({
+    sql: "SELECT * FROM events WHERE id = ?",
+    args: [id],
+  });
+  return result.rows.length > 0 ? (result.rows[0] as unknown as EventRow) : null;
+}
+
+function toJson(row: EventRow) {
+  return {
+    id: row.id,
+    organizerPollarId: row.organizer_pollar_id,
+    name: row.name,
+    description: row.description,
+    datetimeUtc: row.datetime_utc,
+    place: row.place,
+    priceDecimal: stroopsToDecimal(BigInt(row.price_stroops)),
+    capacity: row.capacity,
+    reserved: row.reserved,
+    createdAt: row.created_at,
+  };
+}
+
+/** Owner-only: the organizer panel. 404 before 403 — existence isn't secret, ownership is. */
+export async function GET(request: Request, ctx: Ctx) {
+  const { id } = await ctx.params;
+  await dbReady();
+  const event = await loadEvent(id);
+  if (!event) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+
+  const auth = requireAddress(request, event.organizer_pollar_id);
+  if (!auth.ok) return auth.response;
+
+  return NextResponse.json(toJson(event));
+}
+
+type PatchBody = {
+  name?: string;
+  description?: string;
+  place?: string;
+  datetimeUtc?: string;
+};
+
+/** Owner-only edit. Price and capacity are immutable after creation — they're load-bearing for already-reserved seats. */
+export async function PATCH(request: Request, ctx: Ctx) {
+  const { id } = await ctx.params;
+  await dbReady();
+  const event = await loadEvent(id);
+  if (!event) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+
+  const auth = requireAddress(request, event.organizer_pollar_id);
+  if (!auth.ok) return auth.response;
+
+  let body: PatchBody;
+  try {
+    body = (await request.json()) as PatchBody;
+  } catch {
+    return NextResponse.json({ error: "JSON inválido" }, { status: 400 });
+  }
+
+  const name = body.name?.trim() || event.name;
+  const description = body.description?.trim() ?? event.description;
+  const place = body.place?.trim() || event.place;
+  let datetimeUtc = event.datetime_utc;
+  if (body.datetimeUtc) {
+    const parsed = new Date(body.datetimeUtc);
+    if (Number.isNaN(parsed.getTime())) {
+      return NextResponse.json({ error: "La fecha no es válida" }, { status: 400 });
+    }
+    datetimeUtc = parsed.toISOString();
+  }
+
+  await db.execute({
+    sql: "UPDATE events SET name = ?, description = ?, place = ?, datetime_utc = ? WHERE id = ?",
+    args: [name, description, place, datetimeUtc, id],
+  });
+
+  const updated = await loadEvent(id);
+  return NextResponse.json(toJson(updated!));
+}
