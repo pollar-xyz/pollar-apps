@@ -45,9 +45,9 @@
     {
       "slug": "event-tickets",
       "category": "community",
-      "issue": null,
+      "issue": "https://github.com/pollar-xyz/pollar-apps/issues/13",
       "deploy": null,
-      "author": null
+      "author": "latmontecinos-sketch"
     },
     {
       "slug": "match-predictions",

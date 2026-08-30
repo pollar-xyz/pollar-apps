@@ -1,8 +1,8 @@
 {
-  "name": "",
-  "slug": "",
-  "description": "",
-  "category": "",
+  "name": "Pollar Pass",
+  "slug": "event-tickets",
+  "description": "Buy event tickets by scanning a QR and paying in USDC — get a digital ticket with a unique QR, validated at the door with duplicate-scan protection.",
+  "category": "community",
   "icon": "/icon.png",
   "url": ""
 }
