@@ -3,17 +3,30 @@ import type { Transaction } from "@libsql/client";
 import { db, withTransaction } from "./db.ts";
 import { newId } from "./ids.ts";
 
-/** Unambiguous alphabet: no 0/O, no 1/I/L. 32 symbols = 5 bits/char, no modulo bias (256 / 32). */
+/** Unambiguous alphabet: no 0/O, no 1/I/L. 31 symbols. */
 const ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
 
+/**
+ * 256 isn't a multiple of 31, so a plain `byte % 31` would hand the first
+ * eight symbols one extra byte value each — a small but free-to-avoid bias.
+ * Rejection sampling drops the leftover values instead, keeping every symbol
+ * equally likely.
+ */
+const MAX_UNBIASED_BYTE = 256 - (256 % ALPHABET.length); // 248
+
 function randomCode(length: number): string {
-  const bytes = randomBytes(length);
   let out = "";
-  for (const b of bytes) out += ALPHABET[b % ALPHABET.length];
+  while (out.length < length) {
+    for (const b of randomBytes(length)) {
+      if (b >= MAX_UNBIASED_BYTE) continue;
+      out += ALPHABET[b % ALPHABET.length];
+      if (out.length === length) break;
+    }
+  }
   return out;
 }
 
-/** The QR payload. CSPRNG, 26 chars * 5 bits = 130 bits of entropy. Never derived from sale_id/timestamp. */
+/** The QR payload. CSPRNG, 26 chars * log2(31) ≈ 128.8 bits of entropy. Never derived from sale_id/timestamp. */
 export function generateTicketCode(): string {
   return randomCode(26);
 }
