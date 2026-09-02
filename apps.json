@@ -38,9 +38,9 @@
     {
       "slug": "raffle-hub",
       "category": "commerce",
-      "issue": null,
-      "deploy": null,
-      "author": null
+      "issue": "https://github.com/pollar-xyz/pollar-apps/issues/11",
+      "deploy": "https://raffle-hub-ebon.vercel.app",
+      "author": "josueazc"
     },
     {
       "slug": "event-tickets",
