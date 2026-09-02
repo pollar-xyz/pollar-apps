@@ -1,124 +1,60 @@
 # LATAM Outreach Report — JennyT3
 
-> **Issue:** Closes #22
-> **Branch:** `outreach-latam`
-> **Referred by:** JennyT3
-> **Coverage:** Chile, Uruguay, Colombia, Costa Rica, Brazil, Argentina
-> **Report Date:** 2026-08-28
+> **Issue:** Closes #22 (follow-up to PR #28)
+> **Branch:** `outreach-latam-fix`
+> **Referred by:** @JennyT3
+> **Coverage:** Chile, Costa Rica
+> **Report Date:** 2026-09-01
+>
+> This report is the corrected rewrite requested by the maintainer in PR #28.
+> It reflects the three real, verified bookings (see `CONTEXT.md`) instead of
+> the unverifiable projects listed in the original submission. Only links that
+> resolve are used.
 
 ---
 
 ## Summary
 
-| Country | Communities / Projects | Contacted | Booked | Completed |
-|---------|------------------------|-----------|--------|-----------|
-| Chile | web3 in Chile | 1 | 1 | 1 |
-| Uruguay | Plugin Ecosystem | 1 | 1 | 1 |
-| Colombia | Cripto Ecosystem | 1 | 1 | 1 |
-| Costa Rica | AI Bora | 1 | 1 | 1 |
-| Brazil | Comunidad ERB3 Brasil | 1 | 1 | 1 |
-| Argentina | Argies Veryhere | 1 | 1 | 1 |
-| **Total** | **6 projects** | **6** | **6** | **6** |
-
-**Communities used:** Stellar LATAM builder groups, local hackathon networks, Web3 university clubs, Telegram builder channels, Superteam chapters.
+| # | Call | Country | Project | Contacted | Booked | Completed |
+|---|------|---------|---------|-----------|--------|-----------|
+| 1 | Julio Cruz | Costa Rica | Full-stack Web3 builder portfolio | ✓ | ✓ | ✓ |
+| 2 | Andrés Peña | — | ChatterPay + HealthProof + Nodo Zero | ✓ | ✓ | ✓ |
+| 3 | Simon Espinola | Chile | Dobprotocol | ✓ | ✓ | — (booked) |
+| **Total** | **3 builders** | **2 countries** | **3 projects** | **3** | **3** | **2** |
 
 ---
 
 ## Completed Calls
 
-### 1. web3 in Chile
-- **Project:** web3 in Chile
-- **Country / city:** Chile, Santiago / Valparaiso
-- **Links:** https://github.com/web3inchile/stellar-payments-hub
-- **Stage:** Building
-- **Awards or grants won:** Stellar Community Fund Round 5 (2026-03)
-- **What they build:** Developer hub integrating Stellar payments into local fintechs and running a grants program for Chilean builders.
-- **What infrastructure they need:** Ramp (CLP on/off ramp), wallets, stablecoin balance, low-latency RPC nodes in South America.
-- **Why now:** Expanding from community events to production integrations and need reliable fiat rails for Chilean users.
-- **Call date:** 2026-08-26
-- **Outcome:** Interested. High intent to integrate Stellar payments. Needs technical documentation in Spanish and introductions to local fiat anchors. Follow-up scheduled in 2 weeks.
-- **Referred by:** JennyT3
-- **Booking in Calendly attributed to:** @JennyT3
-
----
-
-### 2. Cripto Ecosystem
-- **Project:** Cripto Ecosystem
-- **Country / city:** Colombia, Bogota / Medellin
-- **Links:** https://github.com/criptoecosystem/dashboard
-- **Stage:** Mainnet
-- **Awards or grants won:** Stellar Build Challenge Winner (2026-05)
-- **What they build:** Educational platform plus DeFi dashboard aggregating yields from liquidity pools on Stellar and other chains.
-- **What infrastructure they need:** Ramp, wallets, stablecoin balance, indexers (Mercury / Hubble), reliable price oracles, multi-sig support for DAO treasury.
-- **Why now:** Live product with early traction; expanding feature set and needs native Soroban integration and better fiat on/off ramps for Colombian users.
-- **Call date:** 2026-08-26
-- **Outcome:** Interested. Active user base. Wants native Soroban integration in next release and is evaluating Pollar for Colombian peso ramps.
-- **Referred by:** JennyT3
-- **Booking in Calendly attributed to:** @JennyT3
-
----
-
-### 3. Plugin Ecosystem
-- **Project:** Plugin Ecosystem
-- **Country / city:** Uruguay, Montevideo
-- **Links:** https://github.com/pluginecosystem/stellar-checkout
-- **Stage:** Testnet
+### 1. Julio Cruz
+- **Project:** Personal portfolio of a full-stack Web3 builder (204 public repos, active)
+- **Country / city:** Costa Rica
+- **Links:** https://github.com/JulioMCruz
+- **Stage:** Building (active full-stack Web3 builder)
 - **Awards or grants won:** —
-- **What they build:** Open-source checkout plugin for WooCommerce / Shopify that lets merchants accept stablecoin payments on Stellar.
-- **What infrastructure they need:** Ramp, wallets, webhook confirmation support, updated JavaScript SDK, testnet sandbox with high-limit faucets.
-- **Why now:** Merchants are asking for crypto checkout; they need to validate volume on testnet before mainnet launch in Q4.
+- **What they build:** Personal portfolio and open-source work as an active full-stack Web3 developer; asked specifically about "Integración con Pollar".
+- **What infrastructure they need:** Stellar/Pollar integration for their builds; ramp and wallet infrastructure.
+- **Why now:** Active builder looking for a payments layer to integrate; matches the exact profile this campaign targets.
 - **Call date:** 2026-08-27
-- **Outcome:** Interested. Architecture validated with Pollar team. Pending volume tests on testnet. Clear path to mainnet integration in Q4 if tests pass.
-- **Referred by:** JennyT3
-- **Booking in Calendly attributed to:** @JennyT3
+- **Outcome:** Completed. Productive fit for the campaign — exactly the builder profile issue #22 exists for. Follow-up to define integration scope.
+- **Referred by:** @JennyT3
+- **Booking attributed to:** — (no Referred by field recorded in the booking; see `CONTEXT.md`)
 
 ---
 
-### 4. AI Bora
-- **Project:** AI Bora
-- **Country / city:** Costa Rica, San Jose
-- **Links:** https://github.com/aibora/soroban-assistant
-- **Stage:** Building
+### 2. Andrés Peña
+- **Project:** ChatterPay + HealthProof + Nodo Zero
+- **Country / city:** —
+- **Links:** https://github.com/P4-Games/ChatterPay · https://github.com/andresanemic
+- **Stage:** Active (ChatterPay repo active, last commit 2026-08-31)
 - **Awards or grants won:** —
-- **What they build:** AI assistant that automates Soroban smart-contract creation and generates Stellar wallets for non-technical users.
-- **What infrastructure they need:** Wallets, Soroban API access, cloud inference hosting.
-- **Why now:** MVP ready; needs wallet infrastructure and mentorship to move from prototype to production-ready tool for Costa Rican developers.
-- **Call date:** 2026-08-27
-- **Outcome:** Follow-up. Concept validated. Needs mentorship from Stellar Dev Rel for the contract-generation module and wallet SDK integration. Re-engagement planned after Dev Rel intro.
-- **Referred by:** JennyT3
-- **Booking in Calendly attributed to:** @JennyT3
-
----
-
-### 5. Comunidad ERB3 Brasil
-- **Project:** Comunidad ERB3 Brasil
-- **Country / city:** Brazil, Recife / Olinda
-- **Links:** https://erb3.org.br
-- **Stage:** In production (community)
-- **Awards or grants won:** Stellar Community Fund Round 6 (2026-06)
-- **What they build:** Web3 community focused on financial inclusion, IRL events, and Stellar development bootcamps for students.
-- **What infrastructure they need:** Ramp, wallets, KYC, event budget, swag, Stellar Quest certification scholarships, physical meetup space.
-- **Why now:** 200+ active members and growing; scaling from local meetups to regional events and needs infrastructure partners to onboard new builders.
-- **Call date:** 2026-08-28
-- **Outcome:** Interested. Active community with 200+ members. Requesting ecosystem funds and infrastructure support to scale to northern Brazil regions. Pollar team evaluating partnership model.
-- **Referred by:** JennyT3
-- **Booking in Calendly attributed to:** @JennyT3
-
----
-
-### 6. Argies Veryhere
-- **Project:** Argies Veryhere
-- **Country / city:** Argentina, Buenos Aires / Cordoba
-- **Links:** https://github.com/argiesveryhere/p2p-payments
-- **Stage:** Testnet
-- **Awards or grants won:** —
-- **What they build:** P2P payment network for remittances and freelance settlements using stablecoins on Stellar, with local on/off ramp.
-- **What infrastructure they need:** Ramp (ARS on/off ramp), wallets, KYC/AML compliance, path-payment support.
-- **Why now:** MVP on testnet with 50 beta users; Argentine freelancers need cheaper remittance rails and stablecoin access.
-- **Call date:** 2026-08-28
-- **Outcome:** Interested. MVP on testnet with 50 beta users. Needs introductions to regulated ARS anchors and KYC provider. Pollar team will make warm intro to Argentine ramp partners.
-- **Referred by:** JennyT3
-- **Booking in Calendly attributed to:** @JennyT3
+- **What they build:** ChatterPay (active repo) plus his own projects HealthProof and Nodo Zero.
+- **What infrastructure they need:** Pollar payment integration across his own projects and the ChatterPay side.
+- **Why now:** The call was productive on both the ChatterPay side and his own project Lore; ongoing engagement.
+- **Call date:** 2026-08-31
+- **Outcome:** Completed. Productive on both ChatterPay and his own project; booking carries explicit attribution ("Jenny T me dio tu contacto").
+- **Referred by:** @JennyT3
+- **Booking attributed to:** @JennyT3 (verified in the booking itself)
 
 ---
 
@@ -126,7 +62,21 @@
 
 | Project | Country | Booked Date | Reason / Status |
 |---------|---------|-------------|-----------------|
-| *(none)* | — | — | All booked calls were completed. |
+| Dobprotocol (Simon Espinola) | Chile | 2026-09-01 | Call booked for 2026-09-01; not yet completed at report time. |
+
+### Simon Espinola
+- **Project:** Dobprotocol
+- **Country / city:** Chile
+- **Links:** https://dobprotocol.com · https://x.com/dobprotocol
+- **Stage:** Live product (site and X profile live)
+- **Awards or grants won:** —
+- **What they build:** Dobprotocol (Chile) — a live product with active public presence.
+- **What infrastructure they need:** Stellar/Pollar payment integration.
+- **Why now:** Live product ready to explore Pollar integration; call scheduled for 2026-09-01.
+- **Call date:** 2026-09-01
+- **Outcome:** Call on the calendar for 2026-09-01. Outcome to be recorded after the call.
+- **Referred by:** @JennyT3
+- **Booking attributed to:** — (no Referred by field recorded in the booking; see `CONTEXT.md`)
 
 ---
 
@@ -140,29 +90,23 @@
 
 ## What Worked
 
-- **Telegram briefs sent at least 24h before each call** gave the Pollar team full context and improved call quality. Every brief was delivered on time.
-- **Warm outreach through existing Stellar LATAM networks** converted at 100% — no cold DMs to company inboxes. All leads came from builder communities, hackathon alumni, and university clubs I am already part of.
-- **Spanish and Portuguese messaging** matched local language preference and reduced friction.
-- **Calendly attribution with `@JennyT3`** in the "Referred by" field made tracking clean and verifiable.
-- **Qualifying before booking** — every project had active repos, live demos, or production communities — eliminated no-shows and unqualified calls.
+- **Targeted warm outreach** reached exactly the builder and live-product profiles issue #22 targets.
+- **Productive calls:** the call with Andrés was productive on both ChatterPay and his own project Lore; Julio is exactly the profile this campaign exists for.
+- **Attribution:** Andrés' booking carried the contributor's handle explicitly; every future booking will carry it in the Referred by field so tracking is clean and verifiable.
+- **Verified links only:** all project links in this report resolve; non-resolving links from the original submission were dropped.
 
 ## What Did Not Work
 
-- **Peru and Paraguay:** Two communities were identified but not contacted yet due to timing; will be added in a follow-up round if the campaign extends.
-- **Venezuela and Ecuador:** Warm intros are pending through regional ambassadors; cold outreach in these markets had lower response rates in past campaigns.
-- **One project in Colombia** initially booked then rescheduled; the rescheduled call became the completed Cripto Ecosystem call on 2026-08-26.
-
----
+- **Original submission overstated scope:** the earlier report listed six completed calls with projects whose repos returned 404 and whose names did not match the calendar. This rewrite corrects that against the verified record in `CONTEXT.md`.
+- **Coverage is narrower than first described:** two verified calls (Costa Rica, Chile) and one cross-border builder, not six countries; remaining LATAM outreach continues.
 
 ## Next Steps
 
-1. **web3 in Chile:** Follow up on 2026-09-09 with Spanish technical docs and local anchor introductions.
-2. **Plugin Ecosystem:** Support testnet volume tests; target mainnet integration in Q4.
-3. **Cripto Ecosystem:** Coordinate Soroban integration roadmap and Colombian peso ramp evaluation.
-4. **AI Bora:** Schedule Dev Rel mentorship intro for wallet SDK and contract-generation module.
-5. **Comunidad ERB3 Brasil:** Submit ecosystem partnership proposal for northern Brazil expansion.
-6. **Argies Veryhere:** Facilitate warm intro to regulated ARS anchors and KYC providers.
+1. **Dobprotocol:** complete the 2026-09-01 call and record its outcome in a follow-up.
+2. **Julio Cruz:** follow up to define the concrete Pollar integration scope for his builds.
+3. **Andrés Peña:** continue engagement on ChatterPay and his projects HealthProof, Nodo Zero, and Lore.
+4. **Keep attribution current:** ensure every future booking carries `@JennyT3` in the referral field.
 
 ---
 
-*Report compiled by JennyT3. All calls attributed via Calendly "Referred by: @JennyT3". Briefs delivered in Telegram at least 24h before each call. Contact details omitted from this public report per project request.*
+*Report compiled by JennyT3. Attribution verified on Andrés' booking; not recorded on the other two (see `CONTEXT.md`). Briefs delivered in Telegram at least 24h before each call. Contact details omitted from this public report per the issue's privacy rule.*
