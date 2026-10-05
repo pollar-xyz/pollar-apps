@@ -1,0 +1,456 @@
+@import "tailwindcss";
+
+/* estilo: mezcla (finwise v2 en el lado del organizador, "poster first" en vitrina y evento) — rediseño 2026-10-04 */
+
+/*
+ * Pollar Pass design tokens. Every color in the app derives from these.
+ * The palette is the logo's: Pollar blue for actions and the brand band, and
+ * the amber of the ticket the bear holds for highlights ("Hoy", few seats).
+ * Light-first. Dark mode is automatic (prefers-color-scheme) or pinned with
+ * <html data-theme="dark|light">; both blocks below carry the same tokens.
+ *
+ * Contrast (WCAG AA, 4.5:1 for text) is checked pair by pair; the pairs that
+ * the previous palette missed are called out where they were fixed.
+ */
+:root {
+  color-scheme: light;
+
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+
+  --primary: #005db4;
+  --primary-hover: #0047a0;
+  --primary-light: #f0f7ff;
+  --primary-foreground: #ffffff;
+
+  --surface: #f8fafc;
+  --surface-hover: #f1f5f9;
+  --border: #e5e7eb;
+
+  /* Secondary text: 5.5:1 on the sheet, 5.0 on the nav (the old #6b7280 gave 4.49 and 4.08). */
+  --muted: #5b6472;
+  /* Decorative only (chevrons, disabled hints). Never for text that must be read. */
+  --muted-light: #9ca3af;
+
+  /* Error as text: 5.9:1 on its tinted box (the old red gave 4.41). */
+  --error: #b91c1c;
+  --error-light: #fef2f2;
+  --error-border: #fecaca;
+
+  /* Success as text: 4.8:1 on its tinted box (the old green gave 3.15). */
+  --success: #15803d;
+  --success-light: #f0fdf4;
+  --success-border: #bbf7d0;
+
+  /* Warning as text: 4.8:1 on its tinted box (the old amber gave 3.07). */
+  --warning: #b45309;
+  --warning-light: #fffbeb;
+  --warning-border: #fde68a;
+
+  /*
+   * Status as a solid fill with its own text color, for what must be read at arm's
+   * length (the door's results). White on these reaches 5:1 and better.
+   */
+  --success-solid: #15803d;
+  --on-success: #ffffff;
+  --error-solid: #b91c1c;
+  --on-error: #ffffff;
+  --warning-solid: #b45309;
+  --on-warning: #ffffff;
+
+  /*
+   * The ticket amber as a UI accent: a fill with dark text (8:1), and as text
+   * on light surfaces (6:1). Used sparingly: "Hoy", few seats left, a highlight.
+   */
+  --accent: #ffb020;
+  --accent-foreground: #3a2300;
+  --accent-soft: #fff3d6;
+  --accent-text: #8a5200;
+
+  /* Pollar Pass mark (components/ui/PassMark.tsx): the white bear, its outline (the app blue, so it follows the theme) and its eye. */
+  --mark-body: #ffffff;
+  --mark-line: var(--primary);
+  --mark-eye: #0b3a8c;
+  /* The amber of the ticket the bear holds: graphics, and "Pass" on the band (4.7:1 on the light band, 7.6:1 on the dark one). */
+  --ticket: #ffb020;
+  /* "Pass" on a light surface: the logo amber, darkened to 4.1:1 or better even on an event's tinted page (the old #c77700 gave 2.8:1 there). Dark theme goes back to the bright amber. */
+  --pass-text: #9a5600;
+
+  /* Keyboard focus: a 3px ring, 6.5:1 on white; on the band it flips to the band's own white (see `.bg-band`). */
+  --focus: #005db4;
+
+  /*
+   * App shell (components/AppShell.tsx): a brand band on top, the content on
+   * a lighter sheet that overlaps it, and a floating bottom nav. The icon
+   * tiles are three steps of the same brand blue, soft → strong. The band is a
+   * little deeper than the action blue so the logo's blue outline reads on it.
+   */
+  --band: #0a4a94;
+  --band-foreground: #ffffff;
+  --sheet: #f2f7fc;
+  --nav: #e2edf8;
+  --field: #e8f0f9;
+  --tile-soft: #d3e5f7;
+  --tile-soft-foreground: #005db4;
+  --tile-mid: #3a86d4;
+  --tile-strong: #005db4;
+  --tile-foreground: #ffffff;
+  /* The brand blue as small text: primary on light, lifted on dark. */
+  --primary-text: #005db4;
+  /* Text over a photo, whatever its colors: a dark scrim and light type, both themes. */
+  --scrim: #000000;
+  --on-scrim: #ffffff;
+}
+
+/*
+ * Dark palette, applied two ways: automatically when the device asks for
+ * dark (unless the reader pinned light), and explicitly when they chose
+ * dark in Preferences. Both blocks carry the same tokens.
+ *
+ * Dark buttons are a lifted blue with dark text: white on the old #1668c1
+ * failed as a link (3.5:1) and as a hovered button (4.0:1), and no single
+ * blue gives white text AND readable text on the near-black page.
+ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --background: #0a0e14;
+    --foreground: #eef2f6;
+
+    --primary: #4c9be8;
+    --primary-hover: #6aaef0;
+    --primary-light: #0e1d33;
+    --primary-foreground: #06182e;
+
+    --surface: #111823;
+    --surface-hover: #18202e;
+    --border: #232d3d;
+
+    --muted: #8b95a5;
+    --muted-light: #647080;
+
+    --error: #f87171;
+    --error-light: #2a1113;
+    --error-border: #542427;
+
+    --success: #4ade80;
+    --success-light: #0c2416;
+    --success-border: #1d4a2c;
+
+    --warning: #fbbf24;
+    --warning-light: #291d05;
+    --warning-border: #57420f;
+
+    /* Status as a solid fill (door results): bright fills with dark text on the dark theme. */
+    --success-solid: #4ade80;
+    --on-success: #052e16;
+    --error-solid: #f87171;
+    --on-error: #2a0a0a;
+    --warning-solid: #fbbf24;
+    --on-warning: #2a1a00;
+
+    --accent: #ffb020;
+    --accent-foreground: #2a1a00;
+    --accent-soft: #2b1f06;
+    --accent-text: #ffc457;
+
+    --focus: #8cc0f5;
+
+    --band: #0c2d52;
+    --band-foreground: #eef2f6;
+    --sheet: #0a0e14;
+    --nav: #111823;
+    --field: #151e2b;
+    --tile-soft: #14335a;
+    --tile-soft-foreground: #8cc0f5;
+    --tile-mid: #1f5fa8;
+    --tile-strong: #1668c1;
+    --tile-foreground: #ffffff;
+    --primary-text: #8cc0f5;
+    --pass-text: #ffb020;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --background: #0a0e14;
+  --foreground: #eef2f6;
+
+  --primary: #4c9be8;
+  --primary-hover: #6aaef0;
+  --primary-light: #0e1d33;
+  --primary-foreground: #06182e;
+
+  --surface: #111823;
+  --surface-hover: #18202e;
+  --border: #232d3d;
+
+  --muted: #8b95a5;
+  --muted-light: #647080;
+
+  --error: #f87171;
+  --error-light: #2a1113;
+  --error-border: #542427;
+
+  --success: #4ade80;
+  --success-light: #0c2416;
+  --success-border: #1d4a2c;
+
+  --warning: #fbbf24;
+  --warning-light: #291d05;
+  --warning-border: #57420f;
+
+  /* Status as a solid fill (door results): bright fills with dark text on the dark theme. */
+  --success-solid: #4ade80;
+  --on-success: #052e16;
+  --error-solid: #f87171;
+  --on-error: #2a0a0a;
+  --warning-solid: #fbbf24;
+  --on-warning: #2a1a00;
+
+  --accent: #ffb020;
+  --accent-foreground: #2a1a00;
+  --accent-soft: #2b1f06;
+  --accent-text: #ffc457;
+
+  --focus: #8cc0f5;
+
+  /* A deeper band on dark: the light one's full blue would glare. */
+  --band: #0c2d52;
+  --band-foreground: #eef2f6;
+  --sheet: #0a0e14;
+  --nav: #111823;
+  --field: #151e2b;
+  --tile-soft: #14335a;
+  --tile-soft-foreground: #8cc0f5;
+  --tile-mid: #1f5fa8;
+  --tile-strong: #1668c1;
+  --tile-foreground: #ffffff;
+  --primary-text: #8cc0f5;
+  --pass-text: #ffb020;
+}
+
+/* Expose the tokens as Tailwind utilities (bg-primary, text-muted, border-border…). */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-light: var(--primary-light);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --color-muted-light: var(--muted-light);
+  --color-error: var(--error);
+  --color-error-light: var(--error-light);
+  --color-error-border: var(--error-border);
+  --color-success: var(--success);
+  --color-success-light: var(--success-light);
+  --color-success-border: var(--success-border);
+  --color-warning: var(--warning);
+  --color-warning-light: var(--warning-light);
+  --color-warning-border: var(--warning-border);
+  --color-success-solid: var(--success-solid);
+  --color-on-success: var(--on-success);
+  --color-error-solid: var(--error-solid);
+  --color-on-error: var(--on-error);
+  --color-warning-solid: var(--warning-solid);
+  --color-on-warning: var(--on-warning);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-text: var(--accent-text);
+  --color-band: var(--band);
+  --color-band-foreground: var(--band-foreground);
+  --color-sheet: var(--sheet);
+  --color-nav: var(--nav);
+  --color-field: var(--field);
+  --color-tile-soft: var(--tile-soft);
+  --color-tile-soft-foreground: var(--tile-soft-foreground);
+  --color-tile-mid: var(--tile-mid);
+  --color-tile-strong: var(--tile-strong);
+  --color-tile-foreground: var(--tile-foreground);
+  --color-primary-text: var(--primary-text);
+  --color-ticket: var(--ticket);
+  --color-pass: var(--pass-text);
+  --color-mark-body: var(--mark-body);
+  --color-mark-line: var(--mark-line);
+  --color-mark-eye: var(--mark-eye);
+  --color-scrim: var(--scrim);
+  --color-on-scrim: var(--on-scrim);
+  --color-tint: var(--tint);
+  --color-tint-text: var(--tint-text);
+  --color-tint-edge: var(--tint-edge);
+  --font-sans: var(--font-poppins);
+  --font-mono: var(--font-geist-mono);
+}
+
+/*
+ * The event's own color ("poster first": the page is tinted with the poster).
+ * A wrapper with class `event-tint` that also carries the inline variables of
+ * accentStyle() (lib/accent.ts) gets, per theme:
+ *   --tint       a soft wash of the poster's color: the page background
+ *   --tint-text  a version of it that reads as text (4.5:1 on the page and on the wash)
+ *   --tint-edge  the poster's color itself: borders and glows, never small text
+ * Without an accent every one of them falls back to the app's own tokens.
+ */
+.event-tint {
+  --tint: var(--event-accent-soft-light, var(--sheet));
+  --tint-text: var(--event-accent-text-light, var(--primary-text));
+  --tint-edge: var(--event-accent, var(--primary));
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .event-tint {
+    --tint: var(--event-accent-soft-dark, var(--sheet));
+    --tint-text: var(--event-accent-text-dark, var(--primary-text));
+  }
+}
+:root[data-theme="dark"] .event-tint {
+  --tint: var(--event-accent-soft-dark, var(--sheet));
+  --tint-text: var(--event-accent-text-dark, var(--primary-text));
+}
+
+html {
+  /* In-page jumps (the "Entradas" button) glide, unless the reader asked for less motion. */
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/*
+ * Keyboard focus, everywhere: a 3px ring offset from the element, never just
+ * the browser's 1px default. Unlayered on purpose, so it also wins over the
+ * `focus:outline-none` that inputs carry. On the brand band the ring is the
+ * band's own light color, since a blue ring would vanish on blue.
+ */
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.bg-band :focus-visible {
+  outline-color: var(--band-foreground);
+}
+/* A dialog opened from the band is a white sheet again: back to the normal ring. */
+.pollar-modal :focus-visible {
+  outline-color: var(--focus);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-poppins), system-ui, sans-serif;
+}
+
+/* Screens inside the app shell sit on the sheet all the way down, footer
+ * included, and leave room for the floating bottom nav. */
+body:has(.app-shell) {
+  background: var(--sheet);
+}
+body:has(.bottom-nav) {
+  padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+}
+
+/*
+ * Small celebration for the moment a ticket exists: the card rises in and
+ * the check mark pops. Motion-sensitive readers get the end state only.
+ */
+@keyframes pollar-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+@keyframes pollar-pop {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+}
+.pollar-rise {
+  animation: pollar-rise 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.pollar-pop {
+  animation: pollar-pop 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pollar-rise,
+  .pollar-pop {
+    animation: none;
+  }
+}
+
+/*
+ * Modal animation (components/ui/Modal.tsx). Pure CSS via @starting-style +
+ * allow-discrete: the sheet slides in/out through the bottom edge on phones
+ * and fades in centered on desktop. Browsers without @starting-style just
+ * skip the animation.
+ */
+.pollar-modal {
+  transition:
+    translate 0.3s ease,
+    opacity 0.3s ease;
+}
+/* display lives here, NOT as a class on the element: a bare `flex` class
+ * would override the closed dialog's native display:none and leave an
+ * invisible layer over the page that swallows clicks. */
+.pollar-modal[open] {
+  display: flex;
+  flex-direction: column;
+  translate: 0 0;
+}
+/* enter: slide up from the bottom edge */
+@starting-style {
+  .pollar-modal[open] {
+    translate: 0 100%;
+  }
+}
+/* exit: Modal.tsx adds .closing, waits for the transition, then close()s.
+ * (A pure-CSS exit via `overlay`/`display allow-discrete` is not reliable;
+ * some engines drop the dialog from the top layer instantly.) */
+.pollar-modal[open].closing {
+  translate: 0 100%;
+}
+
+.pollar-modal::backdrop {
+  background: color-mix(in srgb, var(--foreground) 30%, transparent);
+  backdrop-filter: blur(4px);
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+@starting-style {
+  .pollar-modal[open]::backdrop {
+    opacity: 0;
+  }
+}
+.pollar-modal[open].closing::backdrop {
+  opacity: 0;
+}
+
+/* Desktop: centered, fade + a small rise instead of the full slide */
+@media (min-width: 640px) {
+  .pollar-modal[open] {
+    translate: 0 0;
+    opacity: 1;
+  }
+  @starting-style {
+    .pollar-modal[open] {
+      translate: 0 24px;
+      opacity: 0;
+    }
+  }
+  .pollar-modal[open].closing {
+    translate: 0 24px;
+    opacity: 0;
+  }
+}

@@ -1,0 +1,66 @@
+import { NextResponse } from "next/server";
+import { requireDoorAccess } from "@/lib/auth";
+import { db, dbReady } from "@/lib/db";
+import { sqlUtcToIso } from "@/lib/format";
+import { enforceDoor } from "@/lib/rate-limit";
+import { peekAtDoor } from "@/lib/tickets";
+
+type Ctx = { params: Promise<{ id: string }> };
+
+type EventRow = {
+  organizer_pollar_id: string;
+  door_token: string | null;
+  /** The staff link expires with the event — see `requireDoorAccess`. */
+  datetime_utc: string;
+};
+
+/**
+ * Step 1 of check-in: says what a scanned code is **without spending it**,
+ * so whoever is on the door sees the result and decides. Step 2 (`POST
+ * ../door`) is what actually marks the ticket used.
+ */
+export async function POST(request: Request, ctx: Ctx) {
+  const { id } = await ctx.params;
+
+  await dbReady();
+  const eventResult = await db.execute({
+    sql: "SELECT organizer_pollar_id, door_token, datetime_utc FROM events WHERE id = ?",
+    args: [id],
+  });
+  if (eventResult.rows.length === 0) {
+    return NextResponse.json({ error: "No encontrado", code: "event_not_found" }, { status: 404 });
+  }
+
+  const access = requireDoorAccess(request, eventResult.rows[0] as unknown as EventRow);
+  if (!access.ok) return access.response;
+
+  // Peeking is free to repeat by design, which is what makes it worth
+  // guessing codes on — so it has a ceiling. Its own bucket, though: sharing
+  // one with the check-in made every person cost two hits of a single budget.
+  // Per actor as well as per event, so the staff link and the organizer never
+  // spend each other's budget.
+  const limited = await enforceDoor("check", id, access.actor);
+  if (limited) return limited;
+
+  let body: { code?: string };
+  try {
+    body = (await request.json()) as { code?: string };
+  } catch {
+    return NextResponse.json({ error: "JSON inválido", code: "invalid_json" }, { status: 400 });
+  }
+  const code = body.code?.trim() ?? "";
+  if (!code) {
+    return NextResponse.json({ error: "Falta el código", code: "missing_code" }, { status: 400 });
+  }
+
+  const result = await peekAtDoor(id, code);
+  switch (result.result) {
+    case "VALID":
+      // The door needs something human to confirm against, never the QR payload.
+      return NextResponse.json({ result: "VALID", doorCode: result.ticket.doorCode });
+    case "USED":
+      return NextResponse.json({ result: "USED", usedAt: sqlUtcToIso(result.usedAt) });
+    case "UNKNOWN":
+      return NextResponse.json({ result: "UNKNOWN" });
+  }
+}

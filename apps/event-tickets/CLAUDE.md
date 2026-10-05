@@ -1,0 +1,135 @@
+@AGENTS.md
+
+# Pollar app
+
+This codebase is ONE Pollar app, copied from the pollar-apps template into `apps/<slug>/`. The dev you're helping was assigned that slug and builds their app here, on top of an already-integrated Pollar SDK (payments for emerging markets: every end user has one account and one balance shared across all Pollar apps). Your job is the app, never the plumbing.
+
+For anything SDK-related, the source of truth is https://docs.pollar.xyz/llms-full.txt and the installed types in `node_modules/@pollar/*`. Do not invent SDK methods.
+
+## Architecture map
+
+| Piece | Where | What it does |
+|---|---|---|
+| SDK init | `lib/pollar.tsx` | `PollarAppProvider`, mounted once in `app/layout.tsx`. Reads `NEXT_PUBLIC_POLLAR_PUBLISHABLE_KEY`. Keeps a single `PollarClient` on `globalThis`. The ONLY place Pollar is initialized. |
+| Auth | `hooks/usePollarAuth.ts` | `{ user, isLoading, login, logout, verified }`. Sessions persist across reloads. `user.address` is the user's id across every Pollar app. |
+| Balance | `hooks/useBalance.ts` | `{ balance, currency, asset, isLoading, error, refresh }` in the app's primary asset. Shared SDK state: one refresh updates every consumer. |
+| Login UI | `components/LoginButton.tsx` | Logged out: login modal. Logged in: account button that opens `AccountModal` (email, wallet, log out). |
+| Screen shell | `components/AppShell.tsx`, `components/BottomNav.tsx` | Every in-app screen: a brand band (header, title, optional `hero` for balances or stats), the content on a sheet with a deep top radius that overlaps it, and a floating bottom nav once signed in. New screens use `<AppShell>`, never a bare `<main>` + header. |
+| App modes | `lib/app-mode.ts`, `hooks/useAppMode.ts`, `app/app/AppHome.tsx` | Signed in, the home asks once: looking for events (showcase, tickets) or organizing (sales figures, next events, the door). The choice is a `pase_mode` cookie, a per-browser convenience that guards nothing; the server reads it so the first paint is the right home. The bottom nav carries each mode's tabs, and opening an organizer screen switches to organizer mode (`modeForPath`). |
+| Balance UI | `components/BalanceCard.tsx` | The balance, drawn on the band (it goes in `AppShell`'s `hero`); auto-refreshes after every payment (watches the SDK's global `tx` state). |
+| Showcase | `app/app/page.tsx` → `components/EventShowcase.tsx`, `lib/public-events.ts` | The app's home lists public, upcoming events: a swipeable slider of featured posters, then every event as a row. Server-rendered per request (`connection()`); served by the `(visibility, datetime_utc)` index. Prices read as a range over the tiers that still have seats (`priceRange` in `lib/price-label.ts`, `PRICE_RANGE_COLUMNS` in SQL): the page, the link preview, the showcase and "Mis eventos" all say the same thing. |
+| Visibility | `lib/visibility.ts` | `public` (listed), `private` (page, photo and checkout need the event's access code), `link` (events from before visibility existed: open by link, never listed). Every sale route calls `canView`. |
+| Free tickets | `claimFreeTicket` in `lib/sales.ts`, `app/api/sales/free/route.ts` | A 0-price tier issues seat, sale and ticket in one transaction, one per account per tier. The paid route refuses free tiers. |
+| Event photo | `lib/event-image.ts`, `components/EventImagePicker.tsx` | 4:5 JPEG framed in the browser, verified from its bytes on the server, stored in the database, served versioned. |
+| Welcome gift | `components/WelcomeGiftCard.tsx`, `lib/welcome.ts` | Offers a Pollar distribution rule (Dashboard → Treasury → Token Distribution) via `listDistributionRules()` / `claimDistributionRule()`. Pollar decides who may claim; the payout comes from the app's distribution wallet, never from this server. |
+| Payments | `components/BuyButton.tsx` | The real checkout: reserve a seat, take the server's exclusive right to pay it (`POST /api/sales/:id/pay`, one conditional UPDATE on `sales.pay_started_at`), pay it with the sale's memo via `runTx('payment', …)` (with a bounded `timeoutSec`), then verify against Horizon with backoff. Only the caller that wins the claim sends; every other tab, browser or device verifies by memo. Remembers the purchase per account in `localStorage` so a reload only ever re-verifies, never re-pays. The template's `PayButton`/`SendModal` are gone — they could not carry a memo, which this flow needs. |
+| Network & asset | `lib/network.ts` | The single source of truth for which Stellar network this is: issuer, Horizon URL, explorer links, and the `IS_MAINNET` gate for copy. Refuses to load if `HORIZON_URL` contradicts the publishable key. Nothing else may decide the network. |
+| Receive | `components/ReceiveModal.tsx` | The receive view (address + QR), for a buyer topping up before a purchase. |
+| UI kit | `components/ui/` | `Button`, `Card`, `Icon`, `Input`, `Modal`, `Spinner`, `EmptyState`, `ListRow`/`IconTile`, `Segmented`, `Stat`, `PassLogo`, `PassMark` (the Pollar Pass bear-and-ticket logo; the wordmark is live text, "Pass" in the `ticket`/`pass` amber tokens). Typed, token-styled. `Modal` is the single modal shell: bottom sheet on phones, centered on desktop. |
+| Design tokens | `app/globals.css` | All colors as CSS variables (light by default, dark via `data-theme="dark"`), exposed as Tailwind utilities (`bg-primary`, `text-muted`, …). The shell adds `band`, `sheet`, `nav`, `field` and three icon-tile steps (`tile-soft`/`mid`/`strong`), all from the same brand blue. |
+| Manifest | `pollar.manifest.json` | Identifies the app to the Pollar hub: name, slug, description, category, icon, deploy URL. Must be filled before the PR. |
+| Product page | `app/page.tsx` | The public product page (what Pollar Pass is, who it's for, the way in to `/app`). The app itself starts at `app/app/`. |
+| Languages | `lib/i18n/` | Spanish and English. `es.ts` is the source dictionary and `en.ts` is typed against it; the language comes from a cookie, else `Accept-Language`, else Spanish (a browser that asks only for another language gets Spanish). |
+| Screen states | `components/ScreenLoading.tsx`, `components/LoadError.tsx` | A screen waiting for the session shows `ScreenLoading` (its frame plus a spinner), never a blank page; a failed first load shows `LoadError` with a retry button. |
+| Checkout memory | `lib/checkout.ts` | Pure: what a purchase or refund remembers in the browser (keyed by the account's address) while money may be in flight. It only resumes verification; it never decides whether someone may pay again. |
+| Payment attempts | `lib/pay-attempt.ts`, `lib/claimed-send.ts`, `lib/sales.ts` (`claimPayment`, `claimRefund`, `releaseSale`, `releaseIfDead`, `releaseRefundClaim`, `reopenDeadRefund`), `app/api/sales/[id]/pay`, `app/api/sales/[id]/{release,confirm}`, `app/api/sales/[id]/refund/{start,release}` | The server decides who sends a purchase or a refund: a conditional UPDATE sets `pay_started_at` / `refund_started_at`, and only the winner calls `runTx` (`sendUnderClaim`, its I/O injected so a test proves a loser never reaches the SDK). An attempt is written off only after a rejection the winner proves, or when its transaction can no longer land (`attemptDeadlineMs`: `timeoutSec` + slack), never by the reservation's clock. The claim stretches the sale's hold to that deadline. The winner alone gets a `claimToken` (a loser's answer carries neither it nor the start time) and handing the claim back after the attempt started needs it plus the attempt's `startedAt`. The claim answer carries `remainingSec`; the winner bounds its transaction to `sendWindowSec(remainingSec, time held)` and does not send under 30 s. Expiring a sale or reopening a refund is one guarded UPDATE (the dead/over condition and the observed `pay_started_at` are in its WHERE, `released` comes from its RETURNING), and an empty memo search only counts for a dead attempt if Horizon's ingested history closed past its deadline (`historyPast`, `historyPastFor`). Rows from before the claim protocol are marked as started by a one-time versioned fence (`claim-fence-v1` in `schema_migrations`, `lib/db.ts`), which works whether or not the columns already existed. A search's "none" is judged by the instant taken BEFORE it (`releaseGate`). |
+| Event owner | `lib/event-owner.ts` | `organizerOf(eventId)`: who owns an event, `null` if it doesn't exist; owner-only routes answer 404 before 403. |
+| Event edits | `lib/event-update.ts` | One `UPDATE` that writes only the fields an organizer's edit carries, so racing edits can't undo each other. |
+| Revenue | `lib/revenue.ts` | What each event has collected, summed in BigInt (never `SUM` in SQL). |
+| Check-in email | `lib/checkin-notify.ts` | The best-effort "you're in" email after a check-in: never throws, returns `none`/`sent`/`failed` for the screen. |
+| Door | `app/organizador/puerta/`, `app/organizador/eventos/[id]/puerta/`, `app/puerta/[id]/` | The organizer's "Puerta" tab picks an event and opens its door; staff open the same scanner from the event's door link. The check-in is recorded only when the person taps accept, not when the QR is read. `app/escanear` is a different thing: the poster reader that opens an event's public page. |
+
+## Hard rules
+
+- **Never reinitialize the Pollar SDK.** No `new PollarClient(...)`, no second `<PollarProvider>`. Two live clients trip the server's refresh-token reuse detection and log the user out. Consume Pollar through `usePollarAuth()`, `useBalance()`, or `usePollar()` from `@pollar/react`; for advanced calls use `usePollar().getClient()`.
+- **Never hardcode colors.** Every color comes from the tokens in `app/globals.css`, used via the UI kit or token utilities. New color, new token first.
+- **Never commit `.env` or the API key.** The key lives only in `.env` (gitignored). `.env.example` carries placeholders, never real keys.
+- **All user-facing payments go through `runTx('payment', …)`**, the way `components/BuyButton.tsx` does it. Don't reimplement payment logic, don't build custom signing or submission flows.
+- **Working directory discipline.** Everything you build lives inside this app's folder. In the monorepo, never modify `template/`, other apps under `apps/`, or root files. The only exception is this app's own entry in the root `apps.json`. A PR touching anything else gets rejected.
+
+## How to extend
+
+- **Screens**: add routes under `app/` (this is Next.js 16 App Router; see the note at the top of this file).
+- **Components**: add your own alongside the UI kit; compose the kit primitives.
+- **Server logic**: Next.js route handlers (`app/api/*/route.ts`). The `POLLAR_SECRET_KEY` env var (backend-only) exists for privileged Pollar server calls if you need them.
+- **Dependencies**: install freely inside this folder. The app has its own `package.json` and lockfile, no workspaces, no imports from other apps.
+- **Smart contracts / external backends**: allowed, as long as payments still flow through Pollar.
+
+## Rules this app learned the hard way
+
+Each of these comes from a real defect found in an audit of this codebase,
+not from a style guide. Breaking one has cost something here before.
+
+1. **Money only through `lib/money.ts`.** No amount touches `Number()`,
+   `parseFloat` or `toFixed` outside display formatting. Every amount that
+   comes in needs a lower **and** an upper bound at the validation edge:
+   stroops live in an INTEGER column and libSQL reads integers as JS
+   numbers, so past 2^53 the read throws instead of rounding — and one
+   poisoned row makes a whole event unreadable, with no way back from
+   inside the app.
+
+2. **A value read inside a long-lived callback** (a scanner, a
+   `setInterval`, a subscription) **comes from a ref written on every
+   render**, never from the closure. If a file already keeps an `xRef` for
+   one captured value, every other captured value needs one too. When the
+   guard has to hold within the same tick, write the ref synchronously —
+   state is too late.
+
+3. **Never SELECT-then-UPDATE a shared row.** The condition goes in the
+   `WHERE`, inside `withTransaction`, and `RETURNING` is what tells you
+   whether it applied. A check in JavaScript between two statements is not
+   a check.
+
+4. **Every endpoint that writes carries `enforce()`.** No exceptions
+   without a comment saying why this one is different.
+
+5. **Every user-facing string lives in `lib/i18n/`, error messages
+   included.** The client prefers `t.xxx` over a string from the server;
+   an API error in one language silently defeats the translated
+   dictionaries.
+
+6. **The network and the asset are decided in `lib/network.ts` and
+   nowhere else.** No literal `"testnet"`, `"mainnet"`, issuer, Horizon or
+   explorer URL anywhere else in the tree, and never derive the network in
+   two places — they will disagree, and payments get verified against a
+   chain they never happened on.
+
+7. **Read paths don't write.** Sweeps, purges and migrations belong on a
+   write path or a maintenance route, never in the render of a page a
+   stranger can open.
+
+8. **A new index is justified with `EXPLAIN QUERY PLAN`, before and
+   after.** Any new column in a `WHERE` or `ORDER BY` over `sales`,
+   `events` or `tickets` needs one, and you show the plan using it.
+
+9. **Replacing a template file includes deleting it, in the same commit.**
+   An orphaned template component keeps patterns the rest of the app has
+   already abandoned, and someone will copy from it.
+
+10. **A dependency pulled in for one function needs a written reason.**
+    Check `node:` builtins first.
+
+11. **A component only needed after an action is imported dynamically.**
+    Nobody downloads the QR encoder while still deciding whether to buy.
+
+12. **A function that answers "was this paid?" or "is this valid?" does
+    not merge without a unit test** with its I/O mocked. A manual spike is
+    not coverage.
+
+13. **Types are checked with `pnpm typecheck`, never a bare `tsc`.** Page
+    props use `PageProps`, which Next generates into `.next/types`; a bare
+    `tsc` passes only on a machine that happens to have an old build, and
+    fails on a fresh clone. The same goes for any check: "it passed" means
+    it passed from a clean tree, the way CI runs it.
+
+14. **A best-effort side effect never gets reported as done.** When a send,
+    a notification or a sync may fail silently, the user hears about it
+    only from the result of the attempt (like `emailed` from the confirm
+    route), and the log keeps the provider's reason, not just a status.
+
+## Definition of done (bounty)
+
+1. App deployed (production URL live, e.g. Vercel).
+2. `pollar.manifest.json` completely filled, including the deploy `url`.
+3. Runs from a fresh clone with `pnpm install && pnpm dev` and ONLY the API key in `.env`.
+4. Uses Pollar login and real payments (not mocked).
