@@ -10,11 +10,11 @@
     "test": "node --import tsx --test test/*.test.ts"
   },
   "dependencies": {
-    "@pollar/core": "^0.11.2",
-    "@pollar/react": "^0.11.2",
-    "@x402/core": "2.17.0",
+    "@pollar/core": "^0.12.0",
+    "@pollar/react": "^0.12.0",
+    "@x402/core": "^2.30.0",
     "next": "16.3.1",
-    "nirium-pollar-adapter": "^0.4.1",
+    "nirium-pollar-adapter": "^0.6.0",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
