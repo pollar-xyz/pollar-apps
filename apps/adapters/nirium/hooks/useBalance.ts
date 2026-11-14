@@ -5,19 +5,14 @@ import { usePollar } from "@pollar/react";
 import type { WalletBalanceRecord } from "@pollar/core";
 
 /**
- * The record the app treats as "the balance": the first app-enabled
- * non-native asset (the currency configured in the Pollar dashboard, e.g.
- * USDC), falling back to native XLM when the app has no asset configured.
+ * This app charges in USDC, never XLM: showing "the first app-enabled
+ * asset" (whatever that happens to be) made a brand-new wallet's native XLM
+ * balance look like the balance that matters, when it is not what the pay
+ * button spends. `null` means no USDC trustline/record exists at all yet -
+ * the same "nothing to pay with" state as a trustline that holds "0".
  */
-function primaryRecord(
-  balances: WalletBalanceRecord[]
-): WalletBalanceRecord | null {
-  return (
-    balances.find((b) => b.enabledInApp && b.type !== "native") ??
-    balances.find((b) => b.type === "native") ??
-    balances[0] ??
-    null
-  );
+function usdcRecord(balances: WalletBalanceRecord[]): WalletBalanceRecord | null {
+  return balances.find((b) => b.code === "USDC") ?? null;
 }
 
 /**
@@ -32,6 +27,11 @@ export function useBalance(): {
   currency: string | null;
   /** The full balance record (type, issuer, available amount…). */
   asset: WalletBalanceRecord | null;
+  /**
+   * `true` when there is no USDC to pay with yet: no trustline/record at
+   * all, or one that holds exactly "0". `null` while still loading.
+   */
+  needsUsdc: boolean | null;
   isLoading: boolean;
   error: string | null;
   refresh: () => Promise<void>;
@@ -56,13 +56,15 @@ export function useBalance(): {
 
   const asset =
     walletBalance.step === "loaded"
-      ? primaryRecord(walletBalance.data.balances)
+      ? usdcRecord(walletBalance.data.balances)
       : null;
 
   return {
     balance: asset?.balance ?? null,
     currency: asset?.code ?? null,
     asset,
+    needsUsdc:
+      walletBalance.step !== "loaded" ? null : Number(asset?.balance ?? "0") <= 0,
     isLoading:
       walletBalance.step === "loading" ||
       (isAuthenticated && walletBalance.step === "idle"),
