@@ -1,6 +1,6 @@
 /** "0.0000000" → "0.00", "12.5000000" → "12.50". Falls back to the raw string. */
 export function formatAmount(value: string | null): string {
-  if (value === null) return "—";
+  if (value === null) return "-";
   const n = Number(value);
   if (Number.isNaN(n)) return value;
   return n.toLocaleString(undefined, {

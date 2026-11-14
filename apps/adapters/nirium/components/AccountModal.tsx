@@ -33,7 +33,7 @@ export function AccountModal({
           <div className="flex items-center justify-between gap-4 px-4 py-3.5">
             <span className="text-sm text-muted">{t("account.email")}</span>
             <span className="min-w-0 truncate text-sm font-medium">
-              {user.profile?.mail ?? "—"}
+              {user.profile?.mail ?? "-"}
             </span>
           </div>
           <div className="flex items-center justify-between gap-4 px-4 py-3.5">

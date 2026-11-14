@@ -38,6 +38,14 @@ export interface NiriumMarketResult {
   data: unknown;
   /** Settlement tx hash, read off the payment receipt header set by the facilitator. */
   txHash: string | null;
+  /**
+   * IPFS CID of the audit-trail receipt anchored for this payment, or `null`
+   * when anchoring failed. Anchoring is best-effort and never blocks the
+   * payment result: the $0.05 already settled regardless of whether the
+   * receipt gets anchored, so a failure here must not read as a failed
+   * payment.
+   */
+  cid: string | null;
 }
 
 /**
@@ -63,7 +71,21 @@ export async function fetchNiriumMarket(
   const txHash = responseHeader
     ? decodePaymentResponseHeader(responseHeader).transaction
     : null;
-  return { data, txHash };
+
+  let cid: string | null = null;
+  try {
+    const anchored = await nirium.anchorAuditRecord({
+      txHash: txHash ?? undefined,
+      tag: "pollar-demo-payment",
+      record: { route: "/api/v1/premium/market", amountUsdc: "0.05" },
+    });
+    cid = anchored.cid;
+  } catch {
+    // Anchoring is evidence on top of a payment that already settled -
+    // never surface this as a payment failure.
+  }
+
+  return { data, txHash, cid };
 }
 
 export const NIRIUM_TESTNET_ENDPOINT = TESTNET_ENDPOINT;
